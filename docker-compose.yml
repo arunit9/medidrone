@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app-mysql:
+    container_name: mysql-db
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_DATABASE: medidrone
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+    ports:
+    - "3306:3306"
+    restart: always
+
+  file-upload-api:
+    container_name: medidrone
+    image: arunit9/medidrone
+    restart: on-failure
+    ports:
+    - "8080:8080"
+    depends_on:
+    - app-mysql
+    environment:
+      - DATABASE_HOST=mysql-db
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=fileupload
+      - DATABASE_PORT=3306
