@@ -37,4 +37,24 @@ public class Drone implements Serializable {
 				inverseJoinColumns = @JoinColumn(name = "code"))
 	private Set<Medication> medications = new HashSet<>();
 
+	public Drone(String serialNumber, Model model, Integer weightLimit, Integer batteryCapacity, State state,
+			Set<Medication> medications) {
+		super();
+		this.serialNumber = serialNumber;
+		this.model = model;
+		this.weightLimit = weightLimit;
+		this.batteryCapacity = batteryCapacity;
+		this.state = state;
+		this.medications = medications;
+	}
+
+	public Drone(String serialNumber, Model model, Integer weightLimit, Integer batteryCapacity, State state) {
+		super();
+		this.serialNumber = serialNumber;
+		this.model = model;
+		this.weightLimit = weightLimit;
+		this.batteryCapacity = batteryCapacity;
+		this.state = state;
+	}
+
 }

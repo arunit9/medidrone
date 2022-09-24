@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.app.medidrone.dao.entity.Drone;
+import com.app.medidrone.model.Drone;
 import com.app.medidrone.model.request.DroneMedicationLoadRequest;
 import com.app.medidrone.model.request.DroneRegisterRequest;
 import com.app.medidrone.model.response.DroneMedicationLoadResponse;
 import com.app.medidrone.model.response.DroneMedicationResponse;
+import com.app.medidrone.model.response.DroneRegisterResponse;
 import com.app.medidrone.service.DroneDispatcherService;
 
 /**
@@ -39,10 +40,10 @@ public class DroneDispatcherController {
 	private DroneDispatcherService droneDispatcherService;
 
 	@PostMapping("/register")
-	public ResponseEntity<Drone> registerDrone(
+	public ResponseEntity<DroneRegisterResponse> registerDrone(
 			@RequestBody DroneRegisterRequest droneRequest) {
-		// TODO
-	    return ResponseEntity.status(HttpStatus.OK).body(new Drone());
+		Drone drone = droneDispatcherService.registerDrone(droneRequest.getDrone());
+	    return ResponseEntity.status(HttpStatus.OK).body(new DroneRegisterResponse(drone, "Success"));
 	}
 
 	@PostMapping("/load/{serialNumber}")
