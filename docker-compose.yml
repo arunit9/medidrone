@@ -11,17 +11,22 @@ services:
     - "3306:3306"
     restart: always
 
-  file-upload-api:
+  app-medidrone:
     container_name: medidrone
     image: arunit9/medidrone
     restart: on-failure
     ports:
     - "8080:8080"
+    - "8000:8000"
     depends_on:
     - app-mysql
     environment:
       - DATABASE_HOST=mysql-db
       - DATABASE_USER=root
       - DATABASE_PASSWORD=password
-      - DATABASE_NAME=fileupload
+      - DATABASE_NAME=medidrone
       - DATABASE_PORT=3306
+      - AUDIT_DB_ENABLE=true
+      - AUDIT_PERIOD=10000
+      - SERVER_LOG_LEVEL=DEBUG
+      - SHOW_VALIDATIONS_ERRORS=always
