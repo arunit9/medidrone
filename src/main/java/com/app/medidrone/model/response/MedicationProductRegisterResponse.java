@@ -1,6 +1,6 @@
 package com.app.medidrone.model.response;
 
-import com.app.medidrone.dao.entity.Medication;
+import com.app.medidrone.model.Medication;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "medication")
 @Getter @Setter @NoArgsConstructor
 @ToString
 public class Medication implements Serializable {
@@ -19,16 +20,22 @@ public class Medication implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
    	private Integer weight;
 
-    @Column(nullable=false)
-	private String code;
+//    @Column(nullable = false)
+//	private String code;
 
-	public Medication(Integer weight, String code) {
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(	name = "med_product", 
+				joinColumns = @JoinColumn(name = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "code"))
+    private MedicationProduct medicationProduct;
+
+	public Medication(Integer weight, MedicationProduct medicationProduct) {//, String code) {
 		super();
 		this.weight = weight;
-		this.code = code;
+		this.medicationProduct = medicationProduct;
 	}
 
 }

@@ -10,19 +10,20 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "medicationproduct")
 @Getter @Setter @NoArgsConstructor
 @ToString
 public class MedicationProduct implements Serializable {
 	private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(nullable=false)
+    @Column(nullable = false)
 	private String code;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
 	private String name;
 
-    @Column(nullable=false)
+    @Column(nullable = true)
 	private String image;
 
 	public MedicationProduct(String code, String name, String image) {

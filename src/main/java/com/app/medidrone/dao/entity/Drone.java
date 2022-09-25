@@ -1,8 +1,8 @@
 package com.app.medidrone.dao.entity;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "drone")
 @Getter @Setter @NoArgsConstructor
 @ToString(exclude = {"medications"})
 public class Drone implements Serializable {
@@ -35,10 +36,10 @@ public class Drone implements Serializable {
 	@JoinTable(	name = "drone_medicine", 
 				joinColumns = @JoinColumn(name = "serialNumber"), 
 				inverseJoinColumns = @JoinColumn(name = "code"))
-	private Set<Medication> medications = new HashSet<>();
+	private List<Medication> medications = new ArrayList<>();
 
 	public Drone(String serialNumber, Model model, Integer weightLimit, Integer batteryCapacity, State state,
-			Set<Medication> medications) {
+			List<Medication> medications) {
 		super();
 		this.serialNumber = serialNumber;
 		this.model = model;
@@ -57,4 +58,7 @@ public class Drone implements Serializable {
 		this.state = state;
 	}
 
+	public String getBatteryAuditInfo() {
+		return String.format("drone %s at battery capacity %d %%", this.serialNumber, this.batteryCapacity);
+	}
 }

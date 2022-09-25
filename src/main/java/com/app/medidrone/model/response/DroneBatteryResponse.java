@@ -14,9 +14,9 @@ public class DroneBatteryResponse implements Serializable {
 
 	private String serialNumber;
 
-	private Double battery;
+	private Integer battery;
 
-	public DroneBatteryResponse(String serialNumber, Double battery) {
+	public DroneBatteryResponse(String serialNumber, Integer battery) {
 		super();
 		this.serialNumber = serialNumber;
 		this.battery = battery;

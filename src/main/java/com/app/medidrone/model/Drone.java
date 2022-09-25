@@ -19,8 +19,8 @@ import lombok.ToString;
 public class Drone {
 
 	@NotBlank
-	@Size(min = 10, max = 100, message 
-		      = "Serial number must be between 10 and 100 characters")
+	@Size(min = 10, max = 20, message 
+		      = "Serial number must be between 10 and 20 characters")
 	private String serialNumber;
 
 	@NotNull(message = "Model cannot be null")

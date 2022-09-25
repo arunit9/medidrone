@@ -1,8 +1,10 @@
 package com.app.medidrone.model;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +24,10 @@ public class Medication {
 		= "weight must be greater than or equal to 1mgr")
    	private Integer weight;
 
-	@NotNull
-	@Pattern(regexp = "^[A-Za-z0-9_]+$")
+	@NotBlank
+	@Size(min = 5, max = 20, message 
+		      = "Code must be between 5 and 20 characters")
+	@Pattern(regexp = "^[A-Z0-9_]+$")
 	private String code;
 
 	private String image;

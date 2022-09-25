@@ -2,7 +2,8 @@ package com.app.medidrone.model.request;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 import com.app.medidrone.model.Medication;
 
@@ -15,7 +16,8 @@ import lombok.ToString;
 @ToString
 public class DroneMedicationLoadRequest {
 
-	@NotNull
+	@Valid
+	@NotEmpty
 	private List<Medication> medication;
 
 }

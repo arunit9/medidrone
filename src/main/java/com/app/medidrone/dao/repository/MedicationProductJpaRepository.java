@@ -8,4 +8,5 @@ import com.app.medidrone.dao.entity.MedicationProduct;
 @Repository
 public interface MedicationProductJpaRepository extends JpaRepository<MedicationProduct, String>{
 
+	Boolean existsByCode(String code);
 }
