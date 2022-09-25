@@ -1,4 +1,4 @@
-# file-process-application
+# Medidrone
 
 ## Application Overview
 
@@ -20,19 +20,6 @@ The following are required:
 - Docker
 - docker-compose
 - port 8080 and 3306 must be free
-
-If you do not have the above installed, please run below supplementary scripts in the given order. Executable permission need to be given prior to execution.
-- sudo su
-- chmod +x setup.sh
-- chmod +x docker_setup.sh
-- chmod +x docker_compose_setup.sh
-- ./setup.sh
-- ./docker_setup.sh
-- ./docker_compose_setup.sh
-
-Please note that the command line will prompt a few questions while running for which you need to type “y” (yes).
-
-Once done, please verify maven, java, docker and docker-compose versions to see if installation had been successful.
 
 #### Project Build
 
