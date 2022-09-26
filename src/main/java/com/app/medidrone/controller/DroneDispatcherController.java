@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.app.medidrone.model.Drone;
 import com.app.medidrone.model.Medication;
@@ -75,7 +76,10 @@ public class DroneDispatcherController {
 
 	@GetMapping("/medication/{serialNumber}")
 	public ResponseEntity<DroneMedicationResponse> getLoadedMedication(@PathVariable @NotBlank @Size(min = 10, max = 20) String serialNumber) throws IOException {
-		List<Medication> loadedMedication = droneDispatcherService.getLoadedMedication(serialNumber);
+		String imageDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/medication/image/").toUriString();
+
+		List<Medication> loadedMedication = droneDispatcherService.getLoadedMedication(serialNumber, imageDownloadUri);
+
 		return ResponseEntity.status(HttpStatus.OK).body(new DroneMedicationResponse(serialNumber, loadedMedication));
 	}
 

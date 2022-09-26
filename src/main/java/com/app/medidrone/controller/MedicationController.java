@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,28 +57,28 @@ public class MedicationController {
 	private MedicationService medicationService;
 
 	@PostMapping("/register")
-	public ResponseEntity<MedicationProductRegisterResponse> registerMedicationProduct(@RequestParam("name") @NotBlank @Size(min = 5, max = 20) String name,
-			@RequestParam("code") @NotBlank @Size(min = 5, max = 20) String code, @RequestParam("image") MultipartFile image) {
+	public ResponseEntity<MedicationProductRegisterResponse> registerMedicationProduct(@RequestParam("name") @NotBlank @Size(min = 5, max = 20) @Pattern(regexp = "^[A-Za-z0-9-_]+$") String name,
+			@RequestParam("code") @NotBlank @Size(min = 5, max = 20) @Pattern(regexp = "^[A-Z0-9_]+$") String code, @RequestParam("image") MultipartFile image) {
 		storageService.store(image);
 
-		Medication registeredMedication = medicationService.registerMedicationProduct(code, name, image.getOriginalFilename());
-
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/medication/image/")
-				.path(image.getOriginalFilename()).toUriString();
-		registeredMedication.setImage(fileDownloadUri);
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/medication/image/").toUriString();
+		Medication registeredMedication = medicationService.registerMedicationProduct(code, name, image.getOriginalFilename(), fileDownloadUri);
 
 	    return ResponseEntity.status(HttpStatus.OK).body(new MedicationProductRegisterResponse(registeredMedication, "Success"));
 	}
 
 	@GetMapping
 	public ResponseEntity<MedicationProductsResponse> getAllMedicationProducts() throws IOException {
-		List<Medication> all = medicationService.getAllMedicationProducts();
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/medication/image/").toUriString();
+		List<Medication> all = medicationService.getAllMedicationProducts(fileDownloadUri);
 		return ResponseEntity.status(HttpStatus.OK).body(new MedicationProductsResponse(all));
 	}
 
 	@GetMapping("/{code}")
 	public ResponseEntity<MedicationProductResponse> getMedicationProduct(@PathVariable @NotBlank @Size(min = 5, max = 20) String code) throws IOException {
-		Medication medication = medicationService.getMedicationProduct(code);
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/medication/image/").toUriString();
+		Medication medication = medicationService.getMedicationProduct(code, fileDownloadUri);
+
 		return ResponseEntity.status(HttpStatus.OK).body(new MedicationProductResponse(medication));
 	}
 

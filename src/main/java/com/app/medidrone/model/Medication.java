@@ -15,7 +15,9 @@ import lombok.ToString;
 @ToString
 public class Medication {
 
-	@NotNull
+	@NotBlank
+	@Size(min = 5, max = 20, message 
+    		= "Code must be between 5 and 20 characters")
 	@Pattern(regexp = "^[A-Za-z0-9-_]+$")
 	private String name;
 
@@ -26,7 +28,7 @@ public class Medication {
 
 	@NotBlank
 	@Size(min = 5, max = 20, message 
-		      = "Code must be between 5 and 20 characters")
+			= "Code must be between 5 and 20 characters")
 	@Pattern(regexp = "^[A-Z0-9_]+$")
 	private String code;
 

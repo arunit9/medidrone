@@ -27,6 +27,6 @@ services:
       - DATABASE_NAME=medidrone
       - DATABASE_PORT=3306
       - AUDIT_DB_ENABLE=true
-      - AUDIT_PERIOD=10000
-      - SERVER_LOG_LEVEL=DEBUG
+      - AUDIT_PERIOD=20000
+      - SERVER_LOG_LEVEL=INFO
       - SHOW_VALIDATIONS_ERRORS=always

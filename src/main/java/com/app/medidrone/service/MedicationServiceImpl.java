@@ -24,7 +24,7 @@ public class MedicationServiceImpl implements MedicationService {
 	private MedicationProductJpaRepository medicationProductJpaRepository;
 
 	@Override
-	public Medication registerMedicationProduct(String code, String name, String image) {
+	public Medication registerMedicationProduct(String code, String name, String image, String fileDownloadUri) {
 		if (!code.equals(FilenameUtils.removeExtension(image))) {
 			throw new MedicationProductRegistrationException(String.format("Image file name must match the code %s", code));
 		}
@@ -33,32 +33,37 @@ public class MedicationServiceImpl implements MedicationService {
 		}
 		MedicationProduct entity = medicationProductJpaRepository.save(new MedicationProduct(code, name, image));
 
-		return convertFromEntity(entity);
+		StringBuilder str = new StringBuilder();
+		return convertFromEntity(entity, fileDownloadUri, str);
 	}
 
 	@Override
-	public List<Medication> getAllMedicationProducts() {
+	public List<Medication> getAllMedicationProducts(String fileDownloadUri) {
 		List<MedicationProduct> all = medicationProductJpaRepository.findAll();
 
 		if (all != null) {
+			StringBuilder str = new StringBuilder();
 			return all.stream()
-			        .map(e -> convertFromEntity(e))
+			        .map(e -> convertFromEntity(e, fileDownloadUri, str))
 			        .collect(Collectors.toList());
 		}
 		return null;
 	}
 
 	@Override
-	public Medication getMedicationProduct(String code) {
+	public Medication getMedicationProduct(String code, String fileDownloadUri) {
 		MedicationProduct entity = medicationProductJpaRepository.findById(code).orElse(null);
 
 		if (entity != null) {
-			return convertFromEntity(entity);
+			StringBuilder str = new StringBuilder();
+			return convertFromEntity(entity, fileDownloadUri, str);
 		}
 		return null;
 	}
 
-	private Medication convertFromEntity(MedicationProduct entity) {
-		return new Medication(entity.getName(), null, entity.getCode(), entity.getImage());
+	private Medication convertFromEntity(MedicationProduct entity, String fileDownloadUri, StringBuilder str) {
+		// init StringBuilder
+		str.setLength(0);
+		return new Medication(entity.getName(), null, entity.getCode(), str.append(fileDownloadUri).append(entity.getImage()).toString());
 	}
 }

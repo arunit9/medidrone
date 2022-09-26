@@ -9,4 +9,4 @@ INSERT INTO medicationproduct(code, name, image) VALUES ('MED281536', 'antibioti
 INSERT INTO medicationproduct(code, name, image) VALUES ('MED281754', 'antibiotic5', 'MED281754.png');
 INSERT INTO medicationproduct(code, name, image) VALUES ('MED546193', 'antibiotic6', 'MED546193.png');
 INSERT INTO medicationproduct(code, name, image) VALUES ('MED3443262', 'antibiotic7', 'MED3443262.png');
-INSERT INTO medicationproduct(code, name, image) VALUES ('MED4377029', 'antibiotic7', 'MED4377029.png');
+INSERT INTO medicationproduct(code, name, image) VALUES ('MED4377029', 'antibiotic8', 'MED4377029.png');
