@@ -56,9 +56,11 @@ public interface DroneDispatcherService {
 	/**
 	 * Returns the medication loaded onto a given drone
 	 * @param serialNumber
+	 * @param imageDownloadUri
+	 * 
 	 * @return
 	 */
-	public List<Medication> getLoadedMedication(String serialNumber);
+	public List<Medication> getLoadedMedication(String serialNumber, String imageDownloadUri);
 
 	/**
 	 * Updates the state of the drone

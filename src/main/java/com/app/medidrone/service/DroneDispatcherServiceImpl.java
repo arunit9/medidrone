@@ -175,18 +175,20 @@ public class DroneDispatcherServiceImpl implements DroneDispatcherService {
 		}
 
 		entity.setState(state);
+		entity = droneJpaRepository.save(entity);
 		return convertFromEntity(entity);
 	}
 
 	@Override
-	public List<Medication> getLoadedMedication(String serialNumber) {
+	public List<Medication> getLoadedMedication(String serialNumber, String imageDownloadUri) {
 		com.app.medidrone.dao.entity.Drone entity = droneJpaRepository.findById(serialNumber).orElse(null);
 		if (entity == null) {
 			throw new DroneNotFoundException(String.format("Drone with serial number %s not registered", serialNumber));
 		}
 		if (!Collections.isEmpty(entity.getMedications())) {
+			StringBuilder str = new StringBuilder();
 			return entity.getMedications().stream()
-			        .map(e -> convertFromEntity(e))
+			        .map(e -> convertFromEntity(e, imageDownloadUri, str))
 			        .collect(Collectors.toList());
 		}
 		return null;
@@ -198,8 +200,10 @@ public class DroneDispatcherServiceImpl implements DroneDispatcherService {
 				entity.getState());
 	}
 
-	private Medication convertFromEntity(com.app.medidrone.dao.entity.Medication entity) {
-		return new Medication(entity.getMedicationProduct().getName(), entity.getWeight(), entity.getMedicationProduct().getCode(), entity.getMedicationProduct().getImage());
+	private Medication convertFromEntity(com.app.medidrone.dao.entity.Medication entity, String imageDownloadUri, StringBuilder str) {
+		// init StringBuilder
+		str.setLength(0);
+		return new Medication(entity.getMedicationProduct().getName(), entity.getWeight(), entity.getMedicationProduct().getCode(), str.append(imageDownloadUri).append(entity.getMedicationProduct().getImage()).toString());
 	}
 
 	private com.app.medidrone.dao.entity.Medication convertToEntity(Medication dto) {
