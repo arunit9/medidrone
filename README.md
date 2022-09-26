@@ -463,3 +463,8 @@ PATCH http://localhost:8080/dispatcher/drone/state/SN000000005
 }
 ```
 
+## Database
+
+### ER Diagram
+
+![Medidrone ER Diagram](Medidrone-DB.png)
