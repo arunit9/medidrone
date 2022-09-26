@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "starting  mvn package of the file-upload-api SpringBoot REST"
+echo "starting  mvn package of the medidrone SpringBoot REST"
 mvn package
 
 echo "Finished mvn package"
