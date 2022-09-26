@@ -32,7 +32,7 @@ Open a terminal inside the medidrone directory. The project_build.sh is located 
 - chmod +x project_build.sh
 - ./project_build.sh
 
-or run,
+or run the following commands directly on the command line,
 - mvn package
 - docker build -t arunit9/medidrone .
 - docker-compose up
@@ -45,7 +45,7 @@ The application can be accessed via a web browser at localhost:8080
 
 ### Run
 
-The above process can be run, re-run as many times as you like to build and run the application. The project_run.sh is provided as a quicker option to simply just run the application. It will simply start the docker stack using docker images in your local docker (file-process-api and file-process-web) or Docker Hub (app-mysql). Please ensure that you have run the project_build.sh atleast once before running this script.
+The above process can be run, re-run as many times as you like to build and run the application. The project_run.sh is provided as a quicker option to simply just run the application. It will simply start the docker stack using docker images in your local docker (arunit9/medidrone) or Docker Hub (mysql/mysql-server:5.7). Please ensure that you have run the project_build.sh atleast once before running this script.
 
 **NOTE: I have not pushed my docker images to the Docker Hub**
 
@@ -65,21 +65,33 @@ The project_stop.sh can be executed to stop the application (and the docker stac
 or run,
 - docker-compose down
 
-**NOTE: The file process Spring Boot application is set to delete the content of the file upload directory and drop and recreate the database tables at start.**
+### User Variables
+The following variables can be set on the docker-compose.yml
+
+**AUDIT_DB_ENABLE**
+The audit history of drone battery capacity is always logged to the medidrone log at INFO level. If AUDIT_DB_ENABLE = true, the logs are also added to database audithistory table.
+
+**AUDIT_PERIOD**
+The period of auditing the drone battery capacity in milliseconds.
+
+**SERVER_LOG_LEVEL**
+Log level of the medidrone log
+
+**SHOW_VALIDATIONS_ERRORS**
+Determines how much of information related to input validation errors are displayed to the API client.Possible values are: always, never, on-param
 
 ## Design
-Following decisions were made to the best of my best knowledge considering the requirements of the assignment.
 
 ### Load Medication
-A loading of medication to a drone is restricted to a one load request at a time. Multiple load requests cannot load the same drone even if there is capacity to load more items. This is done to avoid drones being
+The loading of medication to a drone is restricted to one load request at a time. Multiple load requests cannot load the same drone even if there is capacity to load more items. This is done to avoid drones being
 left in loading state.
 
-The knapsack algorithm is used to calculate the optimal combination of medication items to be loaded within the weight limit of a given drone. All medication items are considered of equal value (priority), hence the algorithm only considers the weight as a variable. It is assumed that items are not divisble (fractions of items cannot be loaded). Algorithm can be broken down to 2 steps,
+The knapsack algorithm is used to calculate the optimal combination of medication items to be loaded not exceeding the weight limit of a given drone. All medication items are considered of equal value (priority), hence the algorithm only considers the weight as a variable. It is assumed that items are not divisble (fractions of items cannot be loaded). The algorithm can be broken down to 2 steps,
 
-- Find the maximum possible weight of different medication item combinations (within the weight limit)
+- Find the maximum possible weight of different medication item combinations (not exceeding the drone weight limit)
 - Find the items which are included/excluded from the package at that weight
 
-Eg: If the drone's weight limit is 500mgr and the total weight of medication items is 400mgr. All items can be loaded.
+Eg: If the drone's weight limit is 550mgr and the total weight of medication items is 400mgr. All items can be loaded.
 
 If the total weight of medication items is 600mgr, the algorithm decides the optimal combination.
 
@@ -91,19 +103,19 @@ X + Z -> 300 mgr
 Optimal load is 500mgr with only Y and Z items loaded.
 
 ### Weight
-Weight is persisted as an Integer value representing the weight in milli grams (mgr)
+Weight is persisted as an Integer value representing the weight in milligrams (mgr).
 
 ### Battery Capacity
-Battery Capacity is persisted as an Integer value representing the battery capacity in milli grams (mgr)
+Battery Capacity is persisted as an Integer value representing the battery capacity as a percentage (%).
 
 ### Uploading Medication product details
-The details for a given medical product such as the product name, code and image is done by sql injection at application startup. Additionally, REST api methods are available (MedicationController) to register and view products.
+Registering the details for a given medical product such as the product name, code and image is done by sql injection at application startup. Additionally, REST api methods are available (MedicationController) to register more products and view products.
 
 ## REST API
 ### Auth
 #### Signup
 **URL**
-http://localhost:8080/api/auth/signup
+POST http://localhost:8080/api/auth/signup
 
 **Sample Request**
 ```yaml
@@ -123,7 +135,7 @@ http://localhost:8080/api/auth/signup
 
 #### Login
 **URL**
-http://localhost:8080/api/auth/signin
+POST http://localhost:8080/api/auth/signin
 
 **Sample Request**
 ```yaml
@@ -152,7 +164,7 @@ This is an optional api to register/view medication products. A set of products 
 
 #### Register
 **URL**
-http://localhost:8080/medication/register
+POST http://localhost:8080/medication/register
 
 **Sample Request**
 Request Parameters:
@@ -164,18 +176,18 @@ Image: <image_file>
 ```yaml
 {
     "medication": {
-        "name": "antibiotic1",
+        "name": "vitamin1",
         "weight": null,
-        "code": "MED159622",
-        "image": "MED159622.png"
-    }
-    "status": "success"
+        "code": "MED000001",
+        "image": "http://localhost:8080/medication/image/MED000001.png"
+    },
+    "status": "Success"
 }
 ```
 
 #### Get All
 **URL**
-http://localhost:8080/medication
+GET http://localhost:8080/medication
 
 **Sample Request**
 N/A
@@ -188,49 +200,49 @@ N/A
             "name": "antibiotic1",
             "weight": null,
             "code": "MED159622",
-            "image": "MED159622.png"
+            "image": "http://localhost:8080/medication/image/MED159622.png"
         },
         {
             "name": "antibiotic2",
             "weight": null,
             "code": "MED164529",
-            "image": "MED164529.png"
+            "image": "http://localhost:8080/medication/image/MED164529.png"
         },
         {
             "name": "antibiotic3",
             "weight": null,
             "code": "MED281285",
-            "image": "MED281285.png"
+            "image": "http://localhost:8080/medication/image/MED281285.png"
         },
         {
             "name": "antibiotic4",
             "weight": null,
             "code": "MED281536",
-            "image": "MED281536.png"
+            "image": "http://localhost:8080/medication/image/MED281536.png"
         },
         {
             "name": "antibiotic5",
             "weight": null,
             "code": "MED281754",
-            "image": "MED281754.png"
+            "image": "http://localhost:8080/medication/image/MED281754.png"
         },
         {
             "name": "antibiotic7",
             "weight": null,
             "code": "MED3443262",
-            "image": "MED3443262.png"
+            "image": "http://localhost:8080/medication/image/MED3443262.png"
         },
         {
-            "name": "antibiotic7",
+            "name": "antibiotic8",
             "weight": null,
             "code": "MED4377029",
-            "image": "MED4377029.png"
+            "image": "http://localhost:8080/medication/image/MED4377029.png"
         },
         {
             "name": "antibiotic6",
             "weight": null,
             "code": "MED546193",
-            "image": "MED546193.png"
+            "image": "http://localhost:8080/medication/image/MED546193.png"
         }
     ]
 }
@@ -238,7 +250,7 @@ N/A
 
 #### Get One
 **URL**
-http://localhost:8080/medication/MED159622
+GET http://localhost:8080/medication/MED159622
 
 **Sample Request**
 N/A
@@ -250,26 +262,26 @@ N/A
         "name": "antibiotic1",
         "weight": null,
         "code": "MED159622",
-        "image": "MED159622.png"
+        "image": "http://localhost:8080/medication/image/MED159622.png"
     }
 }
 ```
 
 #### Get image
 **URL**
-http://localhost:8080/medication/image/MED159622.png
+GET http://localhost:8080/medication/image/MED159622.png
 
 **Sample Request**
 N/A
 
 **Sample Response**
-Image downloaded
+Image file
 
 ### Drone Dispatcher
 
 #### Register Drone
 **URL**
-http://localhost:8080/dispatcher/drone/register
+POST http://localhost:8080/dispatcher/drone/register
 
 **Sample Request**
 
@@ -300,7 +312,7 @@ http://localhost:8080/dispatcher/drone/register
 
 #### Find available drones
 **URL**
-http://localhost:8080/dispatcher/drone
+GET http://localhost:8080/dispatcher/drone
 
 **Sample Request**
 N/A
@@ -329,7 +341,7 @@ N/A
 
 #### Load medication to a drone
 **URL**
-http://localhost:8080/dispatcher/drone/load/SN000000001
+POST http://localhost:8080/dispatcher/drone/load/SN000000001
 
 **Sample Request**
 ```yaml
@@ -386,7 +398,7 @@ http://localhost:8080/dispatcher/drone/load/SN000000001
 
 #### Get loaded medication
 **URL**
-http://localhost:8080/dispatcher/drone/medication/SN000000001
+GET http://localhost:8080/dispatcher/drone/medication/SN000000001
 
 **Sample Request**
 N/A
@@ -400,26 +412,54 @@ N/A
             "name": "antibiotic1",
             "weight": 300,
             "code": "MED159622",
-            "image": "MED159622.png"
+            "image": "http://localhost:8080/medication/image/MED159622.png"
         },
         {
             "name": "antibiotic2",
             "weight": 100,
             "code": "MED164529",
-            "image": "MED164529.png"
+            "image": "http://localhost:8080/medication/image/MED164529.png"
         }
     ]
 }
 ```
 #### Check battery capacity of a drone
 **URL**
-http://localhost:8080/dispatcher/drone/battery/SN000000001
+GET http://localhost:8080/dispatcher/drone/battery/SN000000001
 
 **Sample Request**
 N/A
 
 **Sample Response**
+```yaml
 {
     "serialNumber": "SN000000001",
     "battery": 75
 }
+```
+
+#### Update Drone State
+**URL**
+PATCH http://localhost:8080/dispatcher/drone/state/SN000000005
+
+**Sample Request**
+```yaml
+{
+    "state":"RETURNING"
+}
+```
+
+**Sample Response**
+```yaml
+{
+    "drone": {
+        "serialNumber": "SN000000005",
+        "model": "Lightweight",
+        "weightLimit": 500,
+        "batteryCapacity": 100,
+        "state": "RETURNING"
+    },
+    "status": "Success"
+}
+```
+
