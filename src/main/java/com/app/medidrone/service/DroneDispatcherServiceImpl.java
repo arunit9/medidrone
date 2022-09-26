@@ -57,9 +57,7 @@ public class DroneDispatcherServiceImpl implements DroneDispatcherService {
 				drone.getSerialNumber(), drone.getModel(), drone.getWeightLimit(), 
 				drone.getBatteryCapacity(), drone.getState() != null ? drone.getState() : State.IDLE));
 
-		return new Drone(registeredDrone.getSerialNumber(),registeredDrone.getModel(),
-				registeredDrone.getWeightLimit(), registeredDrone.getBatteryCapacity(),
-				registeredDrone.getState());
+		return convertFromEntity(registeredDrone);
 	}
 
 	@Override
@@ -119,15 +117,19 @@ public class DroneDispatcherServiceImpl implements DroneDispatcherService {
 			weights[i] = medication.get(i).getWeight();
 		}
 
+		// validation passed, update state to LOADING
+		entity.setState(State.LOADING);
+		droneJpaRepository.save(entity);
+
 		int sum = medication.stream().collect(Collectors.summingInt(o -> o.getWeight()));
 		// if sum of all medication to be loaded is less than or equal to the drones weight limit
 		// load all medication, no further processing required
 		// update drone state to loaded
 		if (sum <= entity.getWeightLimit()) {
-			entity.setState(State.LOADED);
 			entity.setMedications(medication.stream()
 			        .map(dto -> convertToEntity(dto))
 			        .collect(Collectors.toList()));
+			entity.setState(State.LOADED);
 			droneJpaRepository.save(entity);
 			return new DroneMedicationLoadResponse(serialNumber, medication, null, "Success");
 		}
@@ -149,13 +151,31 @@ public class DroneDispatcherServiceImpl implements DroneDispatcherService {
 				remainingMedication.add(medication.get(i));
 			}
 		}
-		// if at least one medication item is loaded, update drone state to loaded
+		// if at least one medication item is loaded, update drone state to LOADED, else reset to IDLE
 		if(isLoaded) {
 			entity.setState(State.LOADED);
+		} else {
+			entity.setState(State.IDLE);
 		}
 		entity.setMedications(medEntities);
 		droneJpaRepository.save(entity);
 		return new DroneMedicationLoadResponse(serialNumber, loadedMedication, remainingMedication, "Success");
+	}
+
+	@Override
+	public Drone updateDroneState(String serialNumber, State state) {
+		com.app.medidrone.dao.entity.Drone entity = droneJpaRepository.findById(serialNumber).orElse(null);
+
+		if (entity == null) {
+			throw new DroneNotFoundException(String.format("Drone with serial number %s not registered", serialNumber));
+		}
+
+		if (State.LOADED.equals(state) || State.LOADING.equals(state)) {
+			throw new DroneLoadException(String.format("Drone state cannot be manually set to %s", state));
+		}
+
+		entity.setState(state);
+		return convertFromEntity(entity);
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,11 +24,13 @@ import com.app.medidrone.model.Drone;
 import com.app.medidrone.model.Medication;
 import com.app.medidrone.model.request.DroneMedicationLoadRequest;
 import com.app.medidrone.model.request.DroneRegisterRequest;
+import com.app.medidrone.model.request.DroneStateUpdateRequest;
 import com.app.medidrone.model.response.DroneBatteryResponse;
 import com.app.medidrone.model.response.DroneMedicationLoadResponse;
 import com.app.medidrone.model.response.DroneMedicationResponse;
 import com.app.medidrone.model.response.DroneRegisterResponse;
 import com.app.medidrone.model.response.DroneResponse;
+import com.app.medidrone.model.response.DroneStateUpdateResponse;
 import com.app.medidrone.service.DroneDispatcherService;
 import com.app.medidrone.service.DroneLoadException;
 import com.app.medidrone.service.DroneNotFoundException;
@@ -80,6 +83,13 @@ public class DroneDispatcherController {
 	public ResponseEntity<DroneBatteryResponse> getDroneBatteryCapacity(@PathVariable @NotBlank @Size(min = 10, max = 20) String serialNumber) throws IOException {
 		Integer batteryCapacity = droneDispatcherService.getDroneBattery(serialNumber);
 		return ResponseEntity.status(HttpStatus.OK).body(new DroneBatteryResponse(serialNumber, batteryCapacity));
+	}
+
+	@PatchMapping("/state/{serialNumber}")
+	public ResponseEntity<DroneStateUpdateResponse> updateDroneState(@PathVariable @NotBlank @Size(min = 10, max = 20) String serialNumber,
+			@Valid @RequestBody DroneStateUpdateRequest droneStateUpdateRequest) throws IOException {
+		Drone drone = droneDispatcherService.updateDroneState(serialNumber, droneStateUpdateRequest.getState());
+		return ResponseEntity.status(HttpStatus.OK).body(new DroneStateUpdateResponse(drone, "Success"));
 	}
 
 	@ExceptionHandler(DroneRegistrationException.class)
